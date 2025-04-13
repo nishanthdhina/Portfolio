@@ -19,29 +19,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Nishanth Dhina | CEO & Founder of ProVocis | 17-Year-Old Entrepreneur & Developer",
-  description: "Nishanth Dhina is the CEO & Founder of ProVocis, a 17-year-old tech entrepreneur, developer, and innovator creating cutting-edge digital solutions and web applications. Expert in Next.js, React, TypeScript, and cloud technologies.",
+  title: "Nishanth Dhina - Developer & Entrepreneur",
+  description: "Personal portfolio website of Nishanth Dhina, a developer and entrepreneur based in Germany.",
   keywords: [
     "Nishanth Dhina", 
-    "Nishanth Dhinakar", 
+    "Developer", 
+    "Entrepreneur", 
     "ProVocis", 
-    "ProVocis app", 
-    "ProVocis founder", 
-    "17-year-old CEO", 
-    "17-year-old entrepreneur", 
-    "young CEO", 
-    "tech entrepreneur", 
-    "developer portfolio", 
-    "software engineer", 
-    "web developer", 
-    "mobile app developer",
-    "Next.js developer",
-    "React developer",
-    "TypeScript expert",
-    "cloud computing",
-    "AI integration",
-    "digital solutions"
-  ].join(", "),
+    "CEO", 
+    "Founder", 
+    "Web Developer", 
+    "Portfolio"
+  ],
   creator: "Nishanth Dhina",
   authors: [{ name: "Nishanth Dhina", url: "https://nishanthdhina.dev" }],
   metadataBase: new URL('https://nishanthdhina.dev'),
@@ -107,31 +96,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/assets/favicons/favicon.ico' },
-      { url: '/assets/favicons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/assets/favicons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
     ],
     apple: {
-      url: '/assets/favicons/apple-touch-icon.png',
-      sizes: '180x180',
-      type: 'image/png',
+      url: "/favicon.ico",
+      sizes: "any",
     },
-    other: [
-      {
-        rel: 'android-chrome-192x192',
-        url: '/assets/favicons/android-chrome-192x192.png',
-        sizes: '192x192',
-        type: 'image/png',
-      },
-      {
-        rel: 'android-chrome-512x512',
-        url: '/assets/favicons/android-chrome-512x512.png',
-        sizes: '512x512',
-        type: 'image/png',
-      },
-    ],
   },
-  manifest: '/assets/favicons/site.webmanifest',
   appleWebApp: {
     title: 'Nishanth Dhina',
     statusBarStyle: 'black-translucent',
@@ -237,7 +211,6 @@ export default function RootLayout({
         {/* Favicon links for maximum compatibility */}
         <link rel="icon" href="/assets/favicons/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/assets/favicons/apple-touch-icon.png" />
-        <link rel="manifest" href="/assets/favicons/site.webmanifest" />
         
         {/* Preconnect to important domains */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

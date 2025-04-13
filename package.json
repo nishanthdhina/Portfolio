@@ -19,6 +19,7 @@
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
+    "@types/aos": "^3.0.7",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",

@@ -4,22 +4,22 @@ import { useEffect, useState } from 'react';
 import Terminal from './Terminal';
 
 export default function ComputerScreen() {
-  const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   
-  // Check if screen is wide enough to display terminal
+  // Only render the terminal on the client side
   useEffect(() => {
-    const checkWidth = () => {
-      setIsVisible(window.innerWidth >= 1024);
-    };
-    
-    checkWidth();
-    window.addEventListener('resize', checkWidth);
-    
-    return () => window.removeEventListener('resize', checkWidth);
+    setIsMounted(true);
   }, []);
   
-  if (!isVisible) return null;
+  // Show placeholder of same dimensions during SSR to prevent layout shift
+  if (!isMounted) {
+    return (
+      <div className="w-[500px] h-[350px] bg-gray-900/30 rounded-lg border border-gray-800/30 flex items-center justify-center">
+        <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
   
   return (
     <div className="relative">

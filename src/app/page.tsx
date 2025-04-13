@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
 import About from '../components/About';
 import Projects from '../components/Projects';
 import Skills from '../components/Skills';
@@ -11,6 +11,56 @@ import AnimationProvider from '@/components/ui/AnimationProvider';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 
 export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  
+  // Wait for client-side hydration to complete
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+  
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+  
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  // Close menu when user scrolls (better mobile experience)
+  useEffect(() => {
+    const handleScroll = () => {
+      if (mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [mobileMenuOpen]);
+  
+  // If not loaded yet, show a minimal placeholder to prevent layout shift
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+      </div>
+    );
+  }
+  
   return (
     <AnimationProvider>
       <div className="min-h-screen bg-black text-white">
@@ -25,7 +75,9 @@ export default function Home() {
                   Nishanth<span className="text-blue-500">.</span>
                 </Link>
               </div>
-              <div className="hidden md:block">
+              
+              {/* Desktop Navigation - hidden below lg breakpoint (1024px) */}
+              <div className="hidden lg:block">
                 <div className="flex items-center space-x-8">
                   <Link href="#about" className="text-white hover:text-blue-500 transition-colors duration-300">
                     About
@@ -41,7 +93,71 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
+              
+              {/* Hamburger button - visible below lg breakpoint (1024px) */}
+              <div className="flex lg:hidden">
+                <button 
+                  onClick={toggleMobileMenu}
+                  className="inline-flex items-center justify-center p-1.5 rounded-md text-white hover:text-blue-400 border border-transparent hover:border-blue-500/30 hover:bg-blue-900/20 focus:outline-none transition-all duration-300"
+                  aria-label="Toggle mobile menu"
+                >
+                  <span className="sr-only">Open main menu</span>
+                  {!mobileMenuOpen ? (
+                    <div className="w-5 h-4 flex flex-col justify-between">
+                      <span className="w-full h-0.5 bg-current rounded-lg transform transition-all duration-300"></span>
+                      <span className="w-3/4 h-0.5 bg-current rounded-lg transform transition-all duration-300 ml-auto"></span>
+                      <span className="w-full h-0.5 bg-current rounded-lg transform transition-all duration-300"></span>
+                    </div>
+                  ) : (
+                    <div className="w-5 h-4 flex flex-col justify-between">
+                      <span className="w-full h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 rotate-45 translate-y-1.5"></span>
+                      <span className="w-full h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 opacity-0"></span>
+                      <span className="w-full h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 -rotate-45 -translate-y-1.5"></span>
+                    </div>
+                  )}
+                </button>
+              </div>
             </div>
+            
+            {/* Mobile Navigation Menu */}
+            {mobileMenuOpen && (
+              <div ref={menuRef} className="lg:hidden border-t border-white/10 mt-2 py-4 animate-fadeIn bg-black/95 backdrop-blur-sm shadow-lg shadow-blue-900/10">
+                <div className="flex flex-col space-y-3 px-4">
+                  <Link 
+                    href="#about" 
+                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
+                    About
+                  </Link>
+                  <Link 
+                    href="#projects" 
+                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
+                    Projects
+                  </Link>
+                  <Link 
+                    href="#skills" 
+                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
+                    Skills
+                  </Link>
+                  <Link 
+                    href="#contact" 
+                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
+                    Contact
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </nav>
 
@@ -69,47 +185,47 @@ export default function Home() {
                   
                   <div>
                     <h3 className="text-blue-500 font-semibold tracking-wider text-xl mb-2">
-                      Hello, I'm
+                      Hello, I&apos;m
                     </h3>
                     
-                    <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white">
                       Nishanth <span className="text-blue-400">Dhinakar</span>
                     </h1>
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-4 my-6">
                     <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-4 py-2">
-                      <span className="text-lg font-medium text-white/90">
+                      <span className="text-base sm:text-lg font-medium text-white/90">
                         CEO & Founder of <span className="text-blue-500">ProVocis</span>
                       </span>
                     </div>
                     
                     <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-4 py-2">
-                      <span className="text-lg text-white/80">17 years old</span>
+                      <span className="text-base sm:text-lg text-white/80">17 years old</span>
                     </div>
                   </div>
                   
                   <div className="h-1 w-24 bg-blue-500"></div>
                   
-                  <h2 className="text-2xl md:text-3xl font-light text-white/90 max-w-lg">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-light text-white/90 max-w-lg">
                     Creating digital experiences that make a difference
                   </h2>
                   
-                  <p className="text-lg text-white/70 max-w-xl">
+                  <p className="text-base sm:text-lg text-white/70 max-w-xl">
                     I am a driven and innovative developer passionate about crafting impactful digital solutions. Specializing in web development with a focus on cutting-edge AI integration, I transform ideas into elegant products that deliver meaningful user experiences.
                   </p>
                   
                   <div className="mt-8 flex flex-wrap gap-4">
                     <Link 
                       href="#projects" 
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-md transition-all duration-300 shadow-lg shadow-blue-900/20 hover:shadow-blue-900/30"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 sm:px-8 rounded-md transition-all duration-300 shadow-lg shadow-blue-900/20 hover:shadow-blue-900/30"
                     >
                       View My Work
                     </Link>
                     
                     <Link 
                       href="#contact" 
-                      className="bg-white/5 hover:bg-white/10 text-white border border-white/20 hover:border-white/30 font-medium py-3 px-8 rounded-md transition-all duration-300"
+                      className="bg-white/5 hover:bg-white/10 text-white border border-white/20 hover:border-white/30 font-medium py-3 px-6 sm:px-8 rounded-md transition-all duration-300"
                     >
                       Contact Me
                     </Link>
@@ -175,14 +291,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
-          
-          {/* Scroll indicator with smooth scroll */}
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center" data-aos="fade-up" data-aos-delay="800">
-            <span className="text-white/50 text-sm mb-2">Scroll Down</span>
-            <a href="#about" className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center p-1 animate-bounce">
-              <div className="w-1 h-2 bg-white/50 rounded-full"></div>
-            </a>
           </div>
         </section>
 

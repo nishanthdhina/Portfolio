@@ -15,7 +15,7 @@ export default function Terminal() {
       command: '',
       output: (
         <>
-          <span className="text-blue-400 font-bold">Welcome to Nishanth's Terminal v1.0</span>
+          <span className="text-blue-400 font-bold">Welcome to Nishanth&apos;s Terminal v1.0</span>
           <br />
           <span className="text-gray-400">Type <span className="text-yellow-400">help</span> to see available commands</span>
           <br />
@@ -28,82 +28,7 @@ export default function Terminal() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Initialize Audio Context on first user interaction
-  useEffect(() => {
-    const initAudioContext = () => {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-    };
-
-    // Attach to document to ensure we capture the first interaction
-    document.addEventListener('click', initAudioContext, { once: true });
-    document.addEventListener('keydown', initAudioContext, { once: true });
-
-    return () => {
-      document.removeEventListener('click', initAudioContext);
-      document.removeEventListener('keydown', initAudioContext);
-    };
-  }, []);
-
-  // Function to play a beep sound with the Web Audio API
-  const playSound = (type: 'keypress' | 'enter' | 'error') => {
-    if (!soundEnabled || !audioContextRef.current) return;
-    
-    const context = audioContextRef.current;
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-    
-    // Different sound for different actions
-    switch (type) {
-      case 'keypress':
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(440, context.currentTime); // A4
-        gainNode.gain.setValueAtTime(0.1, context.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.1);
-        oscillator.start(context.currentTime);
-        oscillator.stop(context.currentTime + 0.1);
-        break;
-      case 'enter':
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(587.33, context.currentTime); // D5
-        gainNode.gain.setValueAtTime(0.2, context.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.2);
-        oscillator.start(context.currentTime);
-        oscillator.stop(context.currentTime + 0.2);
-        break;
-      case 'error':
-        oscillator.type = 'triangle';
-        oscillator.frequency.setValueAtTime(220, context.currentTime); // A3
-        gainNode.gain.setValueAtTime(0.3, context.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(110, context.currentTime + 0.4); // A2
-        gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.4);
-        oscillator.start(context.currentTime);
-        oscillator.stop(context.currentTime + 0.4);
-        break;
-    }
-  };
-  
-  // Function to play typing sound
-  const playTypingSound = () => {
-    playSound('keypress');
-  };
-  
-  // Function to play enter sound
-  const playEnterSound = () => {
-    playSound('enter');
-  };
-  
-  // Function to play error sound
-  const playErrorSound = () => {
-    playSound('error');
-  };
-  
   // Available commands and their responses
   const commands: Record<string, (args: string[]) => React.ReactNode> = {
     help: () => (
@@ -146,11 +71,12 @@ export default function Terminal() {
     ),
     about: () => (
       <>
-        <span className="text-blue-400 font-bold">About Nishanth Dhina</span>
-        <br />
-        <p className="mt-1">I'm a 17-year-old entrepreneur and developer based in Germany. At ProVocis, I focus on building a platform that makes career growth smarter and more effective. My goal is to bridge the gap between AI and real-world communication, helping professionals improve their skills effortlessly.</p>
-        <p className="mt-1">My journey in technology began at an early age when I discovered my passion for coding. I've been building websites for clients since I was 14, expanding my skills in web development, UI/UX design, and entrepreneurship.</p>
-        <p className="mt-1">When I'm not coding or brainstorming new business ideas, you can find me exploring the latest tech trends, contributing to open-source projects, or mentoring aspiring young developers.</p>
+        <div className="mt-4 animate-fadeIn">
+          <p className="text-green-400 font-bold">About Nishanth Dhina:</p>
+          <p className="mt-1">I&apos;m a 17-year-old entrepreneur and developer based in Germany. At ProVocis, I focus on building a platform that makes career growth smarter and more effective. My goal is to bridge the gap between AI and real-world communication, helping professionals improve their skills effortlessly.</p>
+          <p className="mt-1">My journey in technology began at an early age when I discovered my passion for coding. I&apos;ve been building websites for clients since I was 14, expanding my skills in web development, UI/UX design, and entrepreneurship.</p>
+          <p className="mt-1">When I&apos;m not coding or brainstorming new business ideas, you can find me exploring the latest tech trends, contributing to open-source projects, or mentoring aspiring young developers.</p>
+        </div>
       </>
     ),
     skills: () => (
@@ -331,7 +257,6 @@ export default function Terminal() {
         command: trimmedCommand,
         output: commands[lowerCmdName](args),
       };
-      playEnterSound();
     } else {
       result = {
         command: trimmedCommand,
@@ -342,13 +267,13 @@ export default function Terminal() {
         ),
         isError: true,
       };
-      playErrorSound();
     }
     
     setCommandHistory((prev) => [...prev, result]);
     setInput('');
     setInputHistory((prev) => [...prev, trimmedCommand]);
     setHistoryIndex(-1);
+    return result;
   };
   
   // Handle key presses
@@ -359,7 +284,13 @@ export default function Terminal() {
     }
     
     if (e.key === 'Enter') {
-      executeCommand(input);
+      const result = executeCommand(input);
+      setInput('');
+      // Only update command history if result exists
+      if (result) {
+        setCommandHistory([...commandHistory, result]);
+      }
+      playEnterSound();
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (inputHistory.length > 0) {
@@ -411,33 +342,52 @@ export default function Terminal() {
     inputRef.current?.focus();
   }, []);
   
+  // Function to play a sound using the downloaded MP3 files
+  const playSound = (type: 'keypress' | 'enter' | 'error') => {
+    if (!soundEnabled || typeof window === 'undefined') return;
+    
+    const audio = new Audio();
+    
+    // Use the downloaded MP3 files
+    switch (type) {
+      case 'keypress':
+        audio.src = '/sounds/key-press.mp3';
+        break;
+      case 'enter':
+        audio.src = '/sounds/key-enter.mp3';
+        break;
+      case 'error':
+        audio.src = '/sounds/key-error.mp3';
+        break;
+    }
+    
+    audio.volume = 0.5; // Set an appropriate volume
+    audio.play().catch(err => console.error('Error playing sound:', err));
+  };
+  
+  // Function to play typing sound
+  const playTypingSound = () => {
+    playSound('keypress');
+  };
+  
+  // Function to play enter sound
+  const playEnterSound = () => {
+    playSound('enter');
+  };
+  
   return (
     <div className="w-full h-full flex flex-col">
       {/* Terminal Header */}
-      <div className="h-8 bg-gray-800 flex items-center px-4 justify-between">
+      <div className="bg-gray-800 flex items-center justify-between p-2 rounded-t-lg">
         <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-        <div className="text-gray-400 text-xs font-mono">nishanth@portfolio:~</div>
-        <div className="flex items-center space-x-2">
-          <button 
-            onClick={() => setSoundEnabled(prev => !prev)} 
-            className="text-gray-400 hover:text-white transition-colors"
-            title={soundEnabled ? "Sound On" : "Sound Off"}
-          >
-            {soundEnabled ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clipRule="evenodd" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            )}
-          </button>
+        <div className="text-sm text-gray-300">
+          <span className="text-blue-400 font-bold">Welcome to Nishanth&apos;s Terminal v1.0</span>
         </div>
+        <div className="w-6"></div> {/* Empty div for flex alignment */}
       </div>
       
       {/* Terminal Body */}

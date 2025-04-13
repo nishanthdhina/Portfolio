@@ -342,40 +342,98 @@ export default function Terminal() {
     inputRef.current?.focus();
   }, []);
   
-  // Function to play a sound using the downloaded MP3 files
+  // Sound effect audio elements
+  const [keypressSound] = useState(() => typeof Audio !== 'undefined' ? new Audio('/sounds/key-press.mp3') : null);
+  const [enterSound] = useState(() => typeof Audio !== 'undefined' ? new Audio('/sounds/key-enter.mp3') : null);
+  const [errorSound] = useState(() => typeof Audio !== 'undefined' ? new Audio('/sounds/key-error.mp3') : null);
+  
+  // Preload sounds on component mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // Set volume for all sounds
+    if (keypressSound) keypressSound.volume = 0.3;
+    if (enterSound) enterSound.volume = 0.3;
+    if (errorSound) errorSound.volume = 0.3;
+    
+    // Preload sounds
+    const preloadSounds = async () => {
+      try {
+        // Create temporary audio elements to force preloading
+        const preloadKeypress = new Audio('/sounds/key-press.mp3');
+        const preloadEnter = new Audio('/sounds/key-enter.mp3');
+        const preloadError = new Audio('/sounds/key-error.mp3');
+        
+        // Load the sounds
+        preloadKeypress.load();
+        preloadEnter.load();
+        preloadError.load();
+        
+        // Enable sound after a short delay to ensure browser is ready for audio
+        setTimeout(() => {
+          setSoundEnabled(true);
+        }, 1000);
+      } catch (err) {
+        console.error('Failed to preload sounds:', err);
+      }
+    };
+    
+    preloadSounds();
+    
+    // Create a user interaction detector to enable sound
+    const enableSoundOnInteraction = () => {
+      // Try to play a silent sound to unlock audio on mobile
+      const silentSound = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//uQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAAAAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAANVVV');
+      silentSound.volume = 0.01;
+      silentSound.play().catch(() => {});
+      
+      // Remove event listeners once user has interacted
+      document.removeEventListener('click', enableSoundOnInteraction);
+      document.removeEventListener('keydown', enableSoundOnInteraction);
+    };
+    
+    // Add event listeners to enable sound on user interaction
+    document.addEventListener('click', enableSoundOnInteraction);
+    document.addEventListener('keydown', enableSoundOnInteraction);
+    
+    return () => {
+      document.removeEventListener('click', enableSoundOnInteraction);
+      document.removeEventListener('keydown', enableSoundOnInteraction);
+    };
+  }, [keypressSound, enterSound, errorSound]);
+  
+  // Function to play a sound using the preloaded audio elements
   const playSound = (type: 'keypress' | 'enter' | 'error') => {
     if (!soundEnabled || typeof window === 'undefined') return;
     
     try {
-      const audio = new Audio();
+      let audio: HTMLAudioElement | null = null;
       
-      // Use the correct path to the sound files
       switch (type) {
         case 'keypress':
-          audio.src = '/sounds/key-press.mp3';
+          audio = keypressSound;
           break;
         case 'enter':
-          audio.src = '/sounds/key-enter.mp3';
+          audio = enterSound;
           break;
         case 'error':
-          audio.src = '/sounds/key-error.mp3';
+          audio = errorSound;
           break;
       }
       
-      audio.volume = 0.3; // Lower volume for better experience
+      if (!audio) return;
       
-      // Preload the audio
-      audio.load();
+      // Reset audio to beginning if it's already playing
+      audio.currentTime = 0;
       
-      // Play sound with error handling
+      // Play the sound with error handling
       const playPromise = audio.play();
       
       if (playPromise !== undefined) {
         playPromise.catch(err => {
           console.error('Error playing sound:', err);
-          // Fall back to Audio API if Web Audio API fails
-          const fallbackAudio = document.createElement('audio');
-          fallbackAudio.src = audio.src;
+          // Create a new audio element as fallback if the original fails
+          const fallbackAudio = new Audio(audio?.src);
           fallbackAudio.volume = 0.3;
           fallbackAudio.play().catch(e => console.error('Fallback audio failed:', e));
         });

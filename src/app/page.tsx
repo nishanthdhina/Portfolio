@@ -24,6 +24,11 @@ export default function Home() {
     setMobileMenuOpen(!mobileMenuOpen);
   };
   
+  // Handle link clicks on mobile
+  const handleMobileLinkClick = () => {
+    setMobileMenuOpen(false);
+  };
+  
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -32,11 +37,14 @@ export default function Home() {
       }
     };
     
-    document.addEventListener('mousedown', handleClickOutside);
+    if (mobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [mobileMenuOpen]);
   
   // Close menu when user scrolls (better mobile experience)
   useEffect(() => {
@@ -98,21 +106,20 @@ export default function Home() {
               <div className="flex items-center lg:hidden">
                 <button 
                   onClick={toggleMobileMenu}
-                  className="inline-flex items-center justify-center p-2 rounded-md bg-blue-900/10 text-white hover:text-blue-400 border border-blue-900/20 hover:border-blue-500/30 hover:bg-blue-900/20 focus:outline-none transition-all duration-300"
+                  className="inline-flex items-center justify-center p-2.5 w-10 h-10 rounded-md bg-blue-900/10 text-white hover:text-blue-400 border border-blue-900/20 hover:border-blue-500/30 hover:bg-blue-900/20 focus:outline-none transition-all duration-300"
                   aria-label="Toggle mobile menu"
                 >
                   <span className="sr-only">Open main menu</span>
                   {!mobileMenuOpen ? (
-                    <div className="w-5 h-4 flex flex-col justify-between">
+                    <div className="w-4 h-3.5 flex flex-col justify-between">
                       <span className="w-full h-0.5 bg-current rounded-lg transform transition-all duration-300"></span>
                       <span className="w-3/4 h-0.5 bg-current rounded-lg transform transition-all duration-300 ml-auto"></span>
                       <span className="w-full h-0.5 bg-current rounded-lg transform transition-all duration-300"></span>
                     </div>
                   ) : (
-                    <div className="w-5 h-4 flex flex-col justify-between">
-                      <span className="w-full h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 rotate-45 translate-y-1.5"></span>
-                      <span className="w-full h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 opacity-0"></span>
-                      <span className="w-full h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 -rotate-45 -translate-y-1.5"></span>
+                    <div className="w-4 h-3.5 flex flex-col justify-center items-center">
+                      <span className="absolute w-4 h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 rotate-45"></span>
+                      <span className="absolute w-4 h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 -rotate-45"></span>
                     </div>
                   )}
                 </button>
@@ -121,12 +128,12 @@ export default function Home() {
             
             {/* Mobile Navigation Menu */}
             {mobileMenuOpen && (
-              <div ref={menuRef} className="lg:hidden border-t border-white/10 mt-2 py-4 animate-fadeIn bg-black/95 backdrop-blur-sm shadow-lg shadow-blue-900/10">
-                <div className="flex flex-col space-y-3 px-4">
+              <div ref={menuRef} className="lg:hidden border-t border-white/10 mt-2 py-4 animate-fadeIn bg-black/95 backdrop-blur-sm shadow-lg shadow-blue-900/10 z-50 absolute left-0 right-0 top-16">
+                <div className="flex flex-col space-y-3 px-4 max-w-7xl mx-auto">
                   <Link 
                     href="#about" 
                     className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={handleMobileLinkClick}
                   >
                     <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
                     About
@@ -134,7 +141,7 @@ export default function Home() {
                   <Link 
                     href="#projects" 
                     className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={handleMobileLinkClick}
                   >
                     <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
                     Projects
@@ -142,7 +149,7 @@ export default function Home() {
                   <Link 
                     href="#skills" 
                     className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={handleMobileLinkClick}
                   >
                     <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
                     Skills
@@ -150,7 +157,7 @@ export default function Home() {
                   <Link 
                     href="#contact" 
                     className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={handleMobileLinkClick}
                   >
                     <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
                     Contact
@@ -162,16 +169,16 @@ export default function Home() {
         </nav>
 
         {/* Hero Section */}
-        <section className="min-h-screen flex items-center bg-gradient-to-br from-black via-blue-900/20 to-black">
-          {/* Background elements */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full blur-3xl"></div>
+        <section className="min-h-screen flex items-center bg-gradient-to-br from-black via-blue-900/20 to-black overflow-hidden">
+          {/* Background elements - more responsive for mobile */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 -left-[10%] sm:-left-[5%] w-[50%] sm:w-[40%] aspect-square bg-blue-500/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-[5%] sm:right-0 w-[60%] sm:w-[50%] aspect-square bg-indigo-500/5 rounded-full blur-3xl"></div>
           </div>
 
           {/* Main content */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 mt-16 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 mt-16 relative z-10 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               {/* Left column - Text content */}
               <div data-aos="fade-right" data-aos-delay="200">
                 <div className="space-y-6">

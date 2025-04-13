@@ -67,7 +67,7 @@ export default function Home() {
         <ScrollToTop />
         
         {/* Navigation */}
-        <nav className="bg-black/80 backdrop-blur-sm fixed top-0 w-full z-50 border-b border-white/10">
+        <nav className="bg-black/90 backdrop-blur-sm fixed top-0 w-full z-50 border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
@@ -76,7 +76,7 @@ export default function Home() {
                 </Link>
               </div>
               
-              {/* Desktop Navigation - hidden below lg breakpoint (1024px) */}
+              {/* Desktop Navigation - hidden at 1023px and below */}
               <div className="hidden lg:block">
                 <div className="flex items-center space-x-8">
                   <Link href="#about" className="text-white hover:text-blue-500 transition-colors duration-300">
@@ -94,11 +94,11 @@ export default function Home() {
                 </div>
               </div>
               
-              {/* Hamburger button - visible below lg breakpoint (1024px) */}
-              <div className="flex lg:hidden">
+              {/* Hamburger button - visible at 1023px and below */}
+              <div className="flex items-center lg:hidden">
                 <button 
                   onClick={toggleMobileMenu}
-                  className="inline-flex items-center justify-center p-1.5 rounded-md text-white hover:text-blue-400 border border-transparent hover:border-blue-500/30 hover:bg-blue-900/20 focus:outline-none transition-all duration-300"
+                  className="inline-flex items-center justify-center p-2 rounded-md bg-blue-900/10 text-white hover:text-blue-400 border border-blue-900/20 hover:border-blue-500/30 hover:bg-blue-900/20 focus:outline-none transition-all duration-300"
                   aria-label="Toggle mobile menu"
                 >
                   <span className="sr-only">Open main menu</span>
@@ -279,14 +279,9 @@ export default function Home() {
               </div>
               
               {/* Right column - Interactive Terminal */}
-              <div className="flex justify-center items-center" data-aos="fade-up" data-aos-delay="400">
-                {/* Terminal (visible only on large screens) */}
-                <div className="hidden lg:flex justify-center items-center">
-                  <ComputerScreen />
-                </div>
-                
-                {/* Terminal visible on mobile as well (replaces profile image) */}
-                <div className="lg:hidden">
+              <div className="flex justify-center items-center w-full md:mt-8 lg:mt-0" data-aos="fade-up" data-aos-delay="400">
+                {/* Terminal - responsive on all screen sizes */}
+                <div className="w-full max-w-full mx-auto px-4 sm:px-0">
                   <ComputerScreen />
                 </div>
               </div>

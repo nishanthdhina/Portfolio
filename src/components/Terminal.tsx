@@ -346,23 +346,43 @@ export default function Terminal() {
   const playSound = (type: 'keypress' | 'enter' | 'error') => {
     if (!soundEnabled || typeof window === 'undefined') return;
     
-    const audio = new Audio();
-    
-    // Use the downloaded MP3 files
-    switch (type) {
-      case 'keypress':
-        audio.src = '/sounds/key-press.mp3';
-        break;
-      case 'enter':
-        audio.src = '/sounds/key-enter.mp3';
-        break;
-      case 'error':
-        audio.src = '/sounds/key-error.mp3';
-        break;
+    try {
+      const audio = new Audio();
+      
+      // Use the correct path to the sound files
+      switch (type) {
+        case 'keypress':
+          audio.src = '/sounds/key-press.mp3';
+          break;
+        case 'enter':
+          audio.src = '/sounds/key-enter.mp3';
+          break;
+        case 'error':
+          audio.src = '/sounds/key-error.mp3';
+          break;
+      }
+      
+      audio.volume = 0.3; // Lower volume for better experience
+      
+      // Preload the audio
+      audio.load();
+      
+      // Play sound with error handling
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.error('Error playing sound:', err);
+          // Fall back to Audio API if Web Audio API fails
+          const fallbackAudio = document.createElement('audio');
+          fallbackAudio.src = audio.src;
+          fallbackAudio.volume = 0.3;
+          fallbackAudio.play().catch(e => console.error('Fallback audio failed:', e));
+        });
+      }
+    } catch (err) {
+      console.error('Sound playback error:', err);
     }
-    
-    audio.volume = 0.5; // Set an appropriate volume
-    audio.play().catch(err => console.error('Error playing sound:', err));
   };
   
   // Function to play typing sound

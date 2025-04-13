@@ -230,7 +230,7 @@ export default function Contact() {
             </a>
             
             <a 
-              href="mailto:nishanth.dhina@gmail.com" 
+              href="mailto:nishanthdhinacontact@gmail.com" 
               className="text-white hover:text-blue-400 transition-colors duration-300 transform hover:scale-110"
               data-aos="zoom-in"
               data-aos-delay="900"

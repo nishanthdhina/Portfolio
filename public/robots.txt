@@ -1,6 +1,26 @@
-# Allow all crawlers
+# Robots.txt for nishanthdhina.dev
+# Optimized for maximum search engine visibility
+
+# Allow all web crawlers
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://nishanthdhina.com/sitemap.xml 
+# Allow all directories explicitly
+Allow: /about
+Allow: /projects
+Allow: /contact
+Allow: /blog
+Allow: /assets
+Allow: /sounds
+
+# Make sure no crawl delays
+Crawl-delay: 0
+
+# Indicate resources that should not be crawled (if any)
+# Disallow: /api/
+
+# Sitemap location - important for comprehensive indexing
+Sitemap: https://nishanthdhina.dev/sitemap.xml
+
+# Host directive helps confirm the preferred domain
+Host: nishanthdhina.dev 

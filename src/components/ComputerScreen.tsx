@@ -12,24 +12,21 @@ export default function ComputerScreen() {
     setIsMounted(true);
   }, []);
   
-  // Show placeholder of same dimensions during SSR to prevent layout shift
+  // Don't render anything if not mounted
   if (!isMounted) {
-    return (
-      <div className="w-full max-w-[500px] h-[350px] bg-gray-900/30 rounded-lg border border-gray-800/30 flex items-center justify-center">
-        <div className="w-8 h-8 border-t-2 border-blue-500 rounded-full animate-spin"></div>
-      </div>
-    );
+    return null;
   }
   
   return (
     <div className="relative w-full max-w-[500px] mx-auto">
       {/* Terminal Container */}
       <div 
-        className={`w-full h-[350px] bg-gray-900 rounded-lg overflow-hidden shadow-2xl border border-gray-700 transition-all duration-300 ${
+        className={`w-full h-[300px] sm:h-[350px] bg-gray-900 rounded-lg overflow-hidden shadow-2xl border border-gray-700 transition-all duration-300 ${
           isHovered ? 'shadow-blue-500/20 border-blue-500/30 transform scale-[1.02]' : ''
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={() => setIsHovered(true)}
       >
         {/* Terminal App */}
         <Terminal />

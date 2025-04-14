@@ -20,11 +20,16 @@ export default function Home() {
     setIsLoaded(true);
   }, []);
   
+  // Debug mobile menu state
+  console.log('Mobile menu state:', mobileMenuOpen);
+  
+  // Simplified toggle function
   const toggleMobileMenu = () => {
+    console.log('Toggle called, current state:', mobileMenuOpen);
     setMobileMenuOpen(!mobileMenuOpen);
   };
   
-  // Handle link clicks on mobile
+  // Handle mobile link clicks
   const handleMobileLinkClick = () => {
     setMobileMenuOpen(false);
   };
@@ -32,7 +37,7 @@ export default function Home() {
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (mobileMenuOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMobileMenuOpen(false);
       }
     };
@@ -74,99 +79,135 @@ export default function Home() {
       <div className="min-h-screen bg-black text-white">
         <ScrollToTop />
         
-        {/* Navigation */}
-        <nav className="bg-black/90 backdrop-blur-sm fixed top-0 w-full z-50 border-b border-white/10">
+        {/* Completely redesigned responsive navbar */}
+        <header className="fixed w-full top-0 bg-black/80 backdrop-blur-lg border-b border-white/10 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
-                <Link href="/" className="text-2xl font-bold text-white">
-                  Nishanth<span className="text-blue-500">.</span>
+            <nav className="flex items-center justify-between h-16">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <Link href="/" className="flex items-center">
+                  <span className="text-xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">
+                    Nishanth<span className="text-blue-500">Dhina</span>
+                  </span>
                 </Link>
               </div>
               
-              {/* Desktop Navigation - hidden at 1023px and below */}
-              <div className="hidden lg:block">
-                <div className="flex items-center space-x-8">
-                  <Link href="#about" className="text-white hover:text-blue-500 transition-colors duration-300">
-                    About
-                  </Link>
-                  <Link href="#projects" className="text-white hover:text-blue-500 transition-colors duration-300">
-                    Projects
-                  </Link>
-                  <Link href="#skills" className="text-white hover:text-blue-500 transition-colors duration-300">
-                    Skills
-                  </Link>
-                  <Link href="#contact" className="text-white hover:text-blue-500 transition-colors duration-300">
-                    Contact
-                  </Link>
-                </div>
-              </div>
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex md:items-center md:space-x-6">
+                <a href="#about" className="text-white/80 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-all duration-300 relative group">
+                  <span>About</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
+                </a>
+                <a href="#skills" className="text-white/80 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-all duration-300 relative group">
+                  <span>Skills</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
+                </a>
+                <a href="#projects" className="text-white/80 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-all duration-300 relative group">
+                  <span>Projects</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
+                </a>
+                <a href="#contact" className="text-white/80 hover:text-blue-400 px-3 py-2 text-sm font-medium transition-all duration-300 relative group">
+                  <span>Contact</span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"></span>
+          </a>
+          <a
+                  href="https://github.com/nishanthdhina" 
+            target="_blank"
+            rel="noopener noreferrer"
+                  className="ml-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-blue-400 transition-all duration-300"
+          >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                  </svg>
+          </a>
+        </div>
               
-              {/* Hamburger button - visible at 1023px and below */}
-              <div className="flex items-center lg:hidden">
-                <button 
-                  onClick={toggleMobileMenu}
-                  className="inline-flex items-center justify-center p-2.5 w-10 h-10 rounded-md bg-blue-900/10 text-white hover:text-blue-400 border border-blue-900/20 hover:border-blue-500/30 hover:bg-blue-900/20 focus:outline-none transition-all duration-300"
-                  aria-label="Toggle mobile menu"
+              {/* Simplified Hamburger Button - Only visible on mobile */}
+              <div className="block md:hidden ml-auto">
+                <button
+                  onClick={() => toggleMobileMenu()}
+                  className="z-50 flex flex-col items-center justify-center w-10 h-10 rounded-lg bg-blue-600 text-white"
+                  aria-label="Toggle menu"
                 >
-                  <span className="sr-only">Open main menu</span>
-                  {!mobileMenuOpen ? (
-                    <div className="w-4 h-3.5 flex flex-col justify-between">
-                      <span className="w-full h-0.5 bg-current rounded-lg transform transition-all duration-300"></span>
-                      <span className="w-3/4 h-0.5 bg-current rounded-lg transform transition-all duration-300 ml-auto"></span>
-                      <span className="w-full h-0.5 bg-current rounded-lg transform transition-all duration-300"></span>
-                    </div>
-                  ) : (
-                    <div className="w-4 h-3.5 flex flex-col justify-center items-center">
-                      <span className="absolute w-4 h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 rotate-45"></span>
-                      <span className="absolute w-4 h-0.5 bg-blue-400 rounded-lg transform transition-all duration-300 -rotate-45"></span>
-                    </div>
-                  )}
+                  <span className="block w-5 h-0.5 bg-white mb-1.5"></span>
+                  <span className="block w-5 h-0.5 bg-white mb-1.5"></span>
+                  <span className="block w-5 h-0.5 bg-white"></span>
                 </button>
               </div>
-            </div>
-            
-            {/* Mobile Navigation Menu */}
-            {mobileMenuOpen && (
-              <div ref={menuRef} className="lg:hidden border-t border-white/10 mt-2 py-4 animate-fadeIn bg-black/95 backdrop-blur-sm shadow-lg shadow-blue-900/10 z-50 absolute left-0 right-0 top-16">
-                <div className="flex flex-col space-y-3 px-4 max-w-7xl mx-auto">
-                  <Link 
-                    href="#about" 
-                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={handleMobileLinkClick}
-                  >
-                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
-                    About
-                  </Link>
-                  <Link 
-                    href="#projects" 
-                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={handleMobileLinkClick}
-                  >
-                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
-                    Projects
-                  </Link>
-                  <Link 
-                    href="#skills" 
-                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={handleMobileLinkClick}
-                  >
-                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
-                    Skills
-                  </Link>
-                  <Link 
-                    href="#contact" 
-                    className="text-white hover:text-blue-400 transition-colors duration-300 py-3 px-4 rounded-md hover:bg-white/5 flex items-center"
-                    onClick={handleMobileLinkClick}
-                  >
-                    <span className="inline-block w-1 h-5 bg-blue-500 mr-3 rounded-full"></span>
-                    Contact
-                  </Link>
-                </div>
-              </div>
-            )}
+            </nav>
           </div>
-        </nav>
+          
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div 
+              ref={menuRef}
+              className="fixed inset-0 z-[9999] bg-black"
+            >
+              <div className="flex flex-col items-center pt-20 px-4 min-h-screen">
+                {/* Close button */}
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="absolute top-3 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-lg bg-red-600 text-white"
+                  aria-label="Close menu"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              
+                {/* Logo */}
+                <div className="mb-10 text-center">
+                  <span className="text-3xl font-bold text-white">
+                    Nishanth<span className="text-blue-500">Dhina</span>
+                  </span>
+                </div>
+                
+                {/* Navigation links */}
+                <nav className="mb-10">
+                  <ul className="space-y-8">
+                    <li>
+                      <a 
+                        href="#about" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block text-2xl font-bold text-white hover:text-blue-400 py-2 text-center"
+                      >
+                        About
+                      </a>
+                    </li>
+                    <li>
+                      <a 
+                        href="#skills" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block text-2xl font-bold text-white hover:text-blue-400 py-2 text-center"
+                      >
+                        Skills
+                      </a>
+                    </li>
+                    <li>
+                      <a 
+                        href="#projects" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block text-2xl font-bold text-white hover:text-blue-400 py-2 text-center"
+                      >
+                        Projects
+                      </a>
+                    </li>
+                    <li>
+                      <a 
+                        href="#contact" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block text-2xl font-bold text-white hover:text-blue-400 py-2 text-center"
+                      >
+                        Contact
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          )}
+        </header>
 
         {/* Hero Section */}
         <section className="min-h-screen flex items-center bg-gradient-to-br from-black via-blue-900/20 to-black overflow-hidden">
@@ -286,8 +327,8 @@ export default function Home() {
               </div>
               
               {/* Right column - Interactive Terminal */}
-              <div className="flex justify-center items-center w-full md:mt-8 lg:mt-0" data-aos="fade-up" data-aos-delay="400">
-                {/* Terminal - responsive on all screen sizes */}
+              <div className="w-full flex justify-center items-center mt-8 lg:mt-0" data-aos="fade-up" data-aos-delay="400">
+                {/* Terminal - now visible on all screens */}
                 <div className="w-full max-w-full mx-auto px-4 sm:px-0">
                   <ComputerScreen />
                 </div>
@@ -351,8 +392,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </footer>
-      </div>
+      </footer>
+    </div>
     </AnimationProvider>
   );
 }

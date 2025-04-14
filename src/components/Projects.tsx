@@ -135,20 +135,25 @@ export default function Projects() {
           </div>
           
           <div className="max-w-3xl mx-auto">
-            {/* Testimonial 1 */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6" data-aos="fade-right" data-aos-delay="100">
-              <p className="text-white/80 italic">
+            {/* Testimonial */}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-8" data-aos="fade-up" data-aos-delay="100">
+              <p className="text-white/80 italic text-lg">
                 &quot;I had the privilege of working with Nishanth on the development of our corporate website, and I am thoroughly impressed by his skills, professionalism, and maturity—especially considering he was just 16 years old! His ability to understand complex business requirements and translate them into elegant technical solutions was remarkable.&quot;
               </p>
-              {/* ... client info ... */}
-            </div>
-            
-            {/* Testimonial 2 */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6" data-aos="fade-left" data-aos-delay="200">
-              <p className="text-white/80 italic">
+              
+              <p className="text-white/80 italic text-lg mt-4">
                 &quot;From start to finish, Nishanth demonstrated exceptional attention to detail, ensuring every aspect of our website was polished and aligned with our brand vision. He consistently asked the right questions, provided valuable insights, and delivered a final product that exceeded our expectations. It&apos;s rare to find such a combination of technical expertise and thoughtful communication in someone so young.&quot;
               </p>
-              {/* ... client info ... */}
+              
+              <div className="mt-6 flex items-center">
+                <div className="w-12 h-12 bg-blue-900/40 rounded-full flex items-center justify-center text-blue-400 text-xl font-bold">
+                  NV
+                </div>
+                <div className="ml-4">
+                  <p className="text-white font-semibold">Naveen Veda</p>
+                  <p className="text-blue-400">CTO, Laserbeam Software</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

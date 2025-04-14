@@ -26,6 +26,7 @@ export default function Terminal() {
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const [inputHistory, setInputHistory] = useState<string[]>([]);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [soundsPreloaded, setSoundsPreloaded] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -234,10 +235,11 @@ export default function Terminal() {
     },
     sound: () => {
       setSoundEnabled(prev => !prev);
+      
       return (
-        <>
-          <span>Sound effects {!soundEnabled ? 'enabled' : 'disabled'}</span>
-        </>
+        <div className="text-white">
+          <span>Sound effects {soundEnabled ? 'disabled' : 'enabled'}</span>
+        </div>
       );
     }
   };
@@ -342,101 +344,56 @@ export default function Terminal() {
     inputRef.current?.focus();
   }, []);
   
-  // Sound effect audio elements
-  const [keypressSound] = useState(() => typeof Audio !== 'undefined' ? new Audio('/sounds/key-press.mp3') : null);
-  const [enterSound] = useState(() => typeof Audio !== 'undefined' ? new Audio('/sounds/key-enter.mp3') : null);
-  const [errorSound] = useState(() => typeof Audio !== 'undefined' ? new Audio('/sounds/key-error.mp3') : null);
-  
-  // Preload sounds on component mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    // Set volume for all sounds
-    if (keypressSound) keypressSound.volume = 0.3;
-    if (enterSound) enterSound.volume = 0.3;
-    if (errorSound) errorSound.volume = 0.3;
-    
-    // Preload sounds
-    const preloadSounds = async () => {
-      try {
-        // Create temporary audio elements to force preloading
-        const preloadKeypress = new Audio('/sounds/key-press.mp3');
-        const preloadEnter = new Audio('/sounds/key-enter.mp3');
-        const preloadError = new Audio('/sounds/key-error.mp3');
-        
-        // Load the sounds
-        preloadKeypress.load();
-        preloadEnter.load();
-        preloadError.load();
-        
-        // Enable sound after a short delay to ensure browser is ready for audio
-        setTimeout(() => {
-          setSoundEnabled(true);
-        }, 1000);
-      } catch (err) {
-        console.error('Failed to preload sounds:', err);
-      }
-    };
-    
-    preloadSounds();
-    
-    // Create a user interaction detector to enable sound
-    const enableSoundOnInteraction = () => {
-      // Try to play a silent sound to unlock audio on mobile
-      const silentSound = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//uQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAAAAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAANVVV');
-      silentSound.volume = 0.01;
-      silentSound.play().catch(() => {});
-      
-      // Remove event listeners once user has interacted
-      document.removeEventListener('click', enableSoundOnInteraction);
-      document.removeEventListener('keydown', enableSoundOnInteraction);
-    };
-    
-    // Add event listeners to enable sound on user interaction
-    document.addEventListener('click', enableSoundOnInteraction);
-    document.addEventListener('keydown', enableSoundOnInteraction);
-    
-    return () => {
-      document.removeEventListener('click', enableSoundOnInteraction);
-      document.removeEventListener('keydown', enableSoundOnInteraction);
-    };
-  }, [keypressSound, enterSound, errorSound]);
-  
-  // Function to play a sound using the preloaded audio elements
+  // Simple function to play sounds
   const playSound = (type: 'keypress' | 'enter' | 'error') => {
     if (!soundEnabled || typeof window === 'undefined') return;
     
     try {
-      let audio: HTMLAudioElement | null = null;
+      // Web Audio API approach - will work in any browser
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
       
-      switch (type) {
-        case 'keypress':
-          audio = keypressSound;
-          break;
-        case 'enter':
-          audio = enterSound;
-          break;
-        case 'error':
-          audio = errorSound;
-          break;
+      // Configure different sounds for different actions
+      if (type === 'keypress') {
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 600; // Hz
+        gainNode.gain.value = 0.1; // Volume
+        
+        // Short duration for regular keypress
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start();
+        setTimeout(() => {
+          oscillator.stop();
+        }, 20); // Very short duration
+      } 
+      else if (type === 'enter') {
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 800; // Higher pitch for enter
+        gainNode.gain.value = 0.1;
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start();
+        setTimeout(() => {
+          oscillator.stop();
+        }, 40); // Slightly longer
       }
-      
-      if (!audio) return;
-      
-      // Reset audio to beginning if it's already playing
-      audio.currentTime = 0;
-      
-      // Play the sound with error handling
-      const playPromise = audio.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(err => {
-          console.error('Error playing sound:', err);
-          // Create a new audio element as fallback if the original fails
-          const fallbackAudio = new Audio(audio?.src);
-          fallbackAudio.volume = 0.3;
-          fallbackAudio.play().catch(e => console.error('Fallback audio failed:', e));
-        });
+      else if (type === 'error') {
+        oscillator.type = 'square'; // Different waveform for error
+        oscillator.frequency.value = 200; // Lower pitch
+        gainNode.gain.value = 0.1;
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start();
+        setTimeout(() => {
+          oscillator.stop();
+        }, 70); // Longer duration
       }
     } catch (err) {
       console.error('Sound playback error:', err);
@@ -452,6 +409,48 @@ export default function Terminal() {
   const playEnterSound = () => {
     playSound('enter');
   };
+  
+  // Add preload function after useState declarations but before useEffect
+  useEffect(() => {
+    // Preload sound files
+    const preloadSounds = async () => {
+      try {
+        const soundTypes = ['press', 'enter', 'error'];
+        
+        // Create audio elements for each sound
+        const preloads = soundTypes.map(type => {
+          const audio = new Audio();
+          audio.src = `/sounds/key-${type}.mp3`;
+          // Just requesting the audio will begin loading it
+          audio.load();
+          return audio;
+        });
+        
+        // Set state to indicate sounds are preloaded
+        setSoundsPreloaded(true);
+        console.log('Sound files preloaded successfully');
+      } catch (err) {
+        console.error('Error preloading sounds:', err);
+      }
+    };
+    
+    // Only preload on client
+    if (typeof window !== 'undefined') {
+      preloadSounds();
+    }
+  }, []);
+  
+  // Add this new useEffect for preloading sounds
+  useEffect(() => {
+    // Preload sound files
+    if (typeof window !== 'undefined') {
+      ['press', 'enter', 'error'].forEach(type => {
+        const audio = new Audio(`/sounds/key-${type}.mp3`);
+        audio.load(); // This will cache the audio file
+      });
+      console.log('Sound files preloaded');
+    }
+  }, []);
   
   return (
     <div className="w-full h-full flex flex-col">
